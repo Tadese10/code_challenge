@@ -33,7 +33,8 @@ public class SnippetServiceImpl implements SnippetsService {
     @Override
     public AddSnippetResponseModel addSnippet(SnippetDto snippetDto) throws Exception {
         SnippetEntity query =  snippetRepository.findByName(snippetDto.getName());
-        if(query == null || query.getExpires_at().before(Calendar.getInstance().getTime())){//Doesnt exist
+        Timestamp date = new java.sql.Timestamp(new Date(System.currentTimeMillis()).getTime());
+        if(query == null || date.after(query.getExpires_at())){//Doesnt exist
             if(query == null)
             {
                 query  = modelMapper.map(snippetDto, SnippetEntity.class);
