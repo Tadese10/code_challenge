@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -53,7 +54,8 @@ public class SnippetServiceImpl implements SnippetsService {
     @Override
     public AddSnippetResponseModel getSnippet(String name) {
         SnippetEntity query =  snippetRepository.findByName(name);
-        if(query == null || query.getExpires_at().before(Calendar.getInstance().getTime()))
+        Timestamp date = new java.sql.Timestamp(new Date(System.currentTimeMillis()).getTime());
+        if(query == null || date.after(query.getExpires_at()))
             return null;
         else{
             query.setExpires_at(new Date(System.currentTimeMillis() + (Constant.milliSeconds * Constant.extendAccessTime)));// 1 second equals to 1000 milliseconds
@@ -65,11 +67,12 @@ public class SnippetServiceImpl implements SnippetsService {
     @Override
     public AddSnippetResponseModel likeSnippet(String name) {
         SnippetEntity query =  snippetRepository.findByName(name);
-        if(query == null || query.getExpires_at().before(Calendar.getInstance().getTime()))
+        Timestamp date = new java.sql.Timestamp(new Date(System.currentTimeMillis()).getTime());
+        if(query == null || date.after(query.getExpires_at()))
             return null;
         else{
             query.setLikes(query.getLikes()+1);
-            query.setExpires_at(new Date(System.currentTimeMillis() + (Constant.milliSeconds * Constant.extendAccessTime)));// 1 second equals to 1000 milliseconds
+            query.setExpires_at(new Date(System.currentTimeMillis() +  Constant.extendAccessTime));// 1 second equals to 1000 milliseconds
             snippetRepository.save(query);
             return modelMapper.map(query, AddSnippetResponseModel.class);
         }
