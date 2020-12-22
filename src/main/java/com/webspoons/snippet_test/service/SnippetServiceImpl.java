@@ -73,7 +73,7 @@ public class SnippetServiceImpl implements SnippetsService {
             return null;
         else{
             query.setLikes(query.getLikes()+1);
-            query.setExpires_at(new Date(System.currentTimeMillis() +  Constant.extendAccessTime));// 1 second equals to 1000 milliseconds
+            query.setExpires_at(new Date(System.currentTimeMillis() +  (Constant.milliSeconds * Constant.extendAccessTime)));// 1 second equals to 1000 milliseconds
             snippetRepository.save(query);
             return modelMapper.map(query, AddSnippetResponseModel.class);
         }
